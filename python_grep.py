@@ -36,13 +36,13 @@ class uInput:
         if os.path.isfile(self.confFile) == True:
             self.openConfFile = open(self.confFile, 'a+')
             f = self.openConfFile.readlines()
-            print('Found an existing pygrep.conf file...\n' + str(f))
+            print('Found an existing pygrep.conf file...\n' + self.confFile + '\n' + str(f))
         else:
             self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
-            self.openConfFile = open(self.confFile, 'a')
+            self.openConfFile = open(self.confFile, 'a+')
 
     def _uinFile(self):
-        uInFile = input('What file would you like to search through?\nPlease provide the full path if the file is not in the current directory, "' + self.pwd + '."')
+        uInFile = input('What file would you like to search through?\nPlease provide the full path if the file is not in the current directory, \n"' + self.pwd + '." ')
         if os.path.isfile(uInFile) != True:
             pwduInFile = self.pwd + uInFile
             if os.path.isfile(pwduInFile) != True:
