@@ -36,9 +36,9 @@ class uInput:
 	def _openConfFile(self):
 		self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
 		if os.path.isfile(self.confFile) == True:
-			self.openConfFile = open(self.confFile, 'a+').read()
+			self.openConfFile = open(self.confFile, 'r')
 			print('Found an existing pygrep.conf file...\n')
-			for line in self.openConfFile:
+			for line in self.openConfFile.readlines():
 				print(line)
 		else:
 			self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
@@ -50,6 +50,7 @@ class uInput:
 			pwduInFile = self.pwd + uInFile
 			if os.path.isfile(pwduInFile) != True:
 				print('The file path provided,' + '(' + self.pwd + ')' + uInFile + ' does not exist, please try again.')
+				self._uinFile()
 			else:
 				self.uInFile = pwduInFile
 		else:
@@ -63,7 +64,6 @@ class uInput:
 			self.uinregexPattern = uinRegex
 		elif str.upper(uinRegexYN) == 'Y' or str.upper(uinRegexYN) == 'YES':
 			self.uinBuiltInYN = True
-			self.pickPattern = 
 		else:
 			print('Invalid input, ' + uinRegexYN + '  please try again')
 			self._uinRegex()
@@ -75,20 +75,35 @@ class regex(uInput):
 	def __init__(self):
 		self.regexPattern = None
 		self.builtinPattern = {}
-		self.pickPattern
+		self.pickPattern = None
 		self.buildBuiltinDict()
 		self.collectResp()
 		self._regex(self.pickPattern)
 		self.debug()
 
 	def buildBuiltinDict(self):
-		for x,y in uIn.openConfFile:
+		#file = uIn.openConfFile.read()
+		#for line in self.openConfFile.read():
+			#impPatterns = re.findall('(.+),(.+)',line)
+		print(uIn.openConfFile)
+		impPatterns = re.findall('\".+\"\s\".+\"',uIn.openConfFile.read())
+		print('impPatterns: ' + str(impPatterns))
+		for x,y in impPatterns:
 			self.builtinPattern = dict(x,y)
+		print(str(self.builtinPattern))
 	
 	def collectResp(self):
 		if uIn.uinBuiltInYN == True:
-			
-			self.regexPattern = self.builtinPattern[self.pickPattern]
+			print(self.builtinPattern)
+			print('\n')
+			for x,y in self.builtinPattern:
+				print('\nName : Pattern\n' + x + ' = ' + y)
+			self.pickPattern = input('What pattern name would you like to use? ')
+			try:
+				self.regexPattern = self.builtinPattern[self.pickPattern]
+			except:
+				print('Invalid input ' + self.pickPattern + '. Please try again.\n')
+				self.collectResp()
 		else:
 			print('not true, in process')
 			
