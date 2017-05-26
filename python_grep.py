@@ -34,10 +34,9 @@ class uInput:
     def _openConfFile(self):
         self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
         if os.path.isfile(self.confFile) == True:
-            self.openConfFile = open(self.confFile, 'a+').readlines()
-            print('Found an existing pygrep.conf file...\n')
-            for line in self.openConfFile:
-                print(line)
+            self.openConfFile = open(self.confFile, 'a+')
+            f = self.openConfFile.readlines()
+            print('Found an existing pygrep.conf file...\n' + str(f))
         else:
             self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
             self.openConfFile = open(self.confFile, 'a')
