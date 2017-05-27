@@ -13,6 +13,7 @@ class uInput:
 		self.openConfFile = None
 		self.uinBuiltInYN = None
 		self.pickPattern = None
+		self.builtinDict = {}
 		self.setOS()
 		self.setPWD()
 		self.setslashdir()
@@ -40,12 +41,14 @@ class uInput:
 			print('Found an existing pygrep.conf file...\n')
 			for line in self.openConfFile.readlines():
 				print(line)
+				splitline = line.split()
+				self.builtinDict[(splitline[0])] = ','.join(splitline[1:])
+				print(str(self.builtinDict))
 		else:
-			self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
 			self.openConfFile = open(self.confFile, 'a')
 
 	def _uinFile(self):
-		uInFile = input('What file would you like to search through?\nPlease provide the full path if the file is not in the current directory, \n"' + self.pwd + '."')
+		uInFile = input('What file would you like to search through?\nPlease provide the full path if the file is not in the current directory, \n"' + self.pwd + '."\n#')
 		if os.path.isfile(uInFile) != True:
 			pwduInFile = self.pwd + uInFile
 			if os.path.isfile(pwduInFile) != True:
@@ -76,43 +79,44 @@ class regex(uInput):
 		self.regexPattern = None
 		self.builtinPattern = {}
 		self.pickPattern = None
-		self.buildBuiltinDict()
+		self.openSearchFile = None
+		self.inRegex = None
+		self.inFile = None
+		self.pullInDict()
 		self.collectResp()
 		self._regex(self.pickPattern)
 		self.debug()
 
-	def buildBuiltinDict(self):
-		#file = uIn.openConfFile.read()
-		#for line in self.openConfFile.read():
-			#impPatterns = re.findall('(.+),(.+)',line)
-		print(uIn.openConfFile)
-		impPatterns = re.findall('\".+\"\s\".+\"',uIn.openConfFile.read())
-		print('impPatterns: ' + str(impPatterns))
-		for x,y in impPatterns:
-			self.builtinPattern = dict(x,y)
-		print(str(self.builtinPattern))
+	def pullInDict(self):
+		print('uIn.builtinDict: ' + str(uIn.builtinDict))
+		self.builtinPattern = uIn.builtinDict
+		
+	def setinFile(self):
+		self.inFile = uIn.self.uInFile
 	
 	def collectResp(self):
 		if uIn.uinBuiltInYN == True:
 			print(self.builtinPattern)
 			print('\n')
-			for x,y in self.builtinPattern:
-				print('\nName : Pattern\n' + x + ' = ' + y)
+			for k, v in self.builtinPattern.items():
+				print('\nName = Pattern\n' + k + ' = ' + v)
 			self.pickPattern = input('What pattern name would you like to use? ')
 			try:
-				self.regexPattern = self.builtinPattern[self.pickPattern]
+				self.regexPattern = "'" + self.builtinPattern[self.pickPattern] + "'"
 			except:
 				print('Invalid input ' + self.pickPattern + '. Please try again.\n')
 				self.collectResp()
 		else:
-			print('not true, in process')
+			self.inRegex = uIn.uinregexPattern
+			self.pickPattern = self.inRegex
 			
 	def _regex(self, pattern):
-		getregexp = re.findall(pattern,uInput.uInFile)
-		print(getregexp)
+		self.openSearchFile = open(self.inFile).read()
+		getregexp = re.findall(pattern,self.openSearchFile)
+		#print(getregexp)
 		
 	def debug(self):
-		print('\nself.regexPattern: ' + self.regexPattern + '\nself.builtinPattern: ' + str(self.builtinPattern))
+		print('\nself.regexPattern: ' + self.regexPattern + '\nself.builtinPattern: ' + str(self.builtinPattern) + '\nself.searchFile: ' + str(self.searchFile))
 
 uIn = uInput()
 crex = regex()
