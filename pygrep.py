@@ -83,8 +83,9 @@ class regex(uInput):
 		self.inRegex = None
 		self.inFile = None
 		self.pullInDict()
+		self.setinFile()
 		self.collectResp()
-		self._regex(self.pickPattern)
+		self._regex(self.regexPattern)
 		self.debug()
 
 	def pullInDict(self):
@@ -92,7 +93,7 @@ class regex(uInput):
 		self.builtinPattern = uIn.builtinDict
 		
 	def setinFile(self):
-		self.inFile = uIn.self.uInFile
+		self.inFile = uIn.uInFile
 	
 	def collectResp(self):
 		if uIn.uinBuiltInYN == True:
@@ -102,21 +103,21 @@ class regex(uInput):
 				print('\nName = Pattern\n' + k + ' = ' + v)
 			self.pickPattern = input('What pattern name would you like to use? ')
 			try:
-				self.regexPattern = "'" + self.builtinPattern[self.pickPattern] + "'"
+				self.regexPattern = self.builtinPattern[self.pickPattern]
 			except:
 				print('Invalid input ' + self.pickPattern + '. Please try again.\n')
 				self.collectResp()
 		else:
-			self.inRegex = uIn.uinregexPattern
-			self.pickPattern = self.inRegex
+			self.regexPattern = uIn.uinregexPattern
 			
 	def _regex(self, pattern):
-		self.openSearchFile = open(self.inFile).read()
+		self.openSearchFile = open(self.inFile,'r').read()
+		print('Running re.findall:' + '\n\tpattern: ' + str(pattern) + '\n\tinFile: ' + str(self.inFile) + '\n\topenSearchFile: ' + str(self.openSearchFile))
 		getregexp = re.findall(pattern,self.openSearchFile)
-		#print(getregexp)
+		print('Found: ' + str(getregexp))
 		
 	def debug(self):
-		print('\nself.regexPattern: ' + self.regexPattern + '\nself.builtinPattern: ' + str(self.builtinPattern) + '\nself.searchFile: ' + str(self.searchFile))
+		print('\nself.regexPattern: ' + self.regexPattern + '\nself.builtinPattern: ' + str(self.builtinPattern) + '\nself.searchFile: ' + str(self.openSearchFile))
 
 uIn = uInput()
 crex = regex()
