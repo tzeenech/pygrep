@@ -28,6 +28,14 @@ class uInput:
 	def setOS(self):
 		self.os = os.name
 
+	def clearscreen(self):
+		if self.os == 'nt':
+			os.system('cls')
+		elif self.os == 'posix':
+			os.system('clear')
+		else:
+			print('\n' * 200)
+
 	def setPWD(self):
 		self.pwd = os.getcwd()
 
@@ -38,6 +46,7 @@ class uInput:
 			self.slashdir = '/'
 
 	def _openConfFile(self):
+		self.clearscreen()
 		self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
 		if os.path.isfile(self.confFile) == True:
 			self.openConfFile = open(self.confFile, 'r')
@@ -61,24 +70,24 @@ class uInput:
 			self.uInFile = uInFile
 
 	def _uinRegex(self):
-		uinRegexYN = input('Would you like to use a built-in regex pattern, or provide your own? Y/N (N) ')
+		uinRegexYN = input('Would you like to use a built-in regex pattern, or provide your own? Y/N (N)\npygrep>> ')
 		if uinRegexYN == '' or str.upper(uinRegexYN) == 'N' or str.upper(uinRegexYN) == 'NO':
 			self.uinBuiltInYN = False
-			uinRegex = input('What is the regex pattern to search with? ')
+			uinRegex = input('What is the regex pattern to search with?\npygrep>> ')
 			self.uinregexPattern = uinRegex
 		elif str.upper(uinRegexYN) == 'Y' or str.upper(uinRegexYN) == 'YES':
 			self.uinBuiltInYN = True
 		else:
 			print('Invalid input, ' + uinRegexYN + '  please try again')
 			self._uinRegex()
-	
+
 	def uinOutFile(self):
 		uinOutYN = input('Would you like to save the output to a file, or just display it on the screen?\n1 = File\n2 = Screen\n3 = Both \n(Screen) \npygrep>> ')
 		if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F':
 			uinOutFilePath = input('Provide output file path: ')
 			if os.path.isfile(uinOutFilePath) == True:
 				self.uinOutFilePath = uinOutFilePath
-				overwrite = input('That file exists (' + uinOutFilePath + '), overwrite? Y/N (N)')
+				overwrite = input('That file exists (' + uinOutFilePath + '), overwrite? Y/N (N)\npygrep>> ')
 				if overwrite == '' or str.upper(overwrite) == 'N' or str.upper(overwrite) == 'NO':
 					self.uinOutFile()
 				elif str.upper(overwrite) == 'Y' or str.upper(overwrite) == 'YES':
@@ -111,17 +120,17 @@ class regex(uInput):
 	def pullInDict(self):
 		print('uIn.builtinDict: ' + str(uIn.builtinDict))
 		self.builtinPattern = uIn.builtinDict
-		
+
 	def setinFile(self):
 		self.inFile = uIn.uInFile
-	
+
 	def collectResp(self):
 		if uIn.uinBuiltInYN == True:
 			print(self.builtinPattern)
 			print('\n')
 			for k, v in self.builtinPattern.items():
 				print('\nName = Pattern\n' + k + ' = ' + v)
-			self.pickPattern = input('What pattern name would you like to use? ')
+			self.pickPattern = input('What pattern name would you like to use?\npygrep>> ')
 			try:
 				self.regexPattern = self.builtinPattern[self.pickPattern]
 			except:
@@ -129,19 +138,19 @@ class regex(uInput):
 				self.collectResp()
 		else:
 			self.regexPattern = uIn.uinregexPattern
-			
+
 	def _regex(self, pattern):
 		self.openSearchFile = open(self.inFile,'r').read()
 		getregexp = re.findall(pattern,self.openSearchFile)
 		print('Found: ' + str(getregexp))
-		
+
 	def debug(self):
 		if cmdOpt.debug == True:
 			print('\nself.regexPattern: ' + self.regexPattern + '\nself.builtinPattern: ' + str(self.builtinPattern))
-			print('Running re.findall:' + '\n\tpattern: ' + str(pattern) + '\n\tinFile: ' + str(self.inFile) + '\n\topenSearchFile: ' + str(self.openSearchFile))
+			print('Running re.findall:' + '\n\tpattern: ' + str(self.regexPattern) + '\n\tinFile: ' + str(self.inFile) + '\n\topenSearchFile: ' + str(self.openSearchFile))
 		else:
 			pass
-		
+
 class CommandLineOptions:
 	'Allow for optional commandl-line input'
 	def __init__(self):
@@ -149,23 +158,24 @@ class CommandLineOptions:
 		self.switches()
 		self.CommandLineOptionsDebug()
 
-				
+
 	def switches(self):
 		parser = argparse.ArgumentParser()
 		argparse.ArgumentParser(prog='pygrep.py', prefix_chars='-/')
 		parser.add_argument('-debug', help='Print debugging information',action='store_true')
 		args = parser.parse_args()
 		self.debug = args.debug
-	
+
 	def getdebug(self):
 		return(self.debug)
-	
+
 	def CommandLineOptionsDebug(self):
 		if self.debug == True:
-			print('\n--CommandLineOptionsDebug--') 
+			print('\n--CommandLineOptionsDebug--')
 			print('self.debug: ' + str(self.debug))
 		else:
 			pass
+
 
 cmdOpt = CommandLineOptions()
 uIn = uInput()
