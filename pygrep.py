@@ -15,6 +15,7 @@ class uInput:
 		self.uinBuiltInYN = None
 		self.pickPattern = None
 		self.uinOutFilePath = None
+		self.uinOutYN = None
 		self.builtinDict = {}
 		self.setOS()
 		self.setPWD()
@@ -70,12 +71,12 @@ class uInput:
 			self.uInFile = uInFile
 
 	def _uinRegex(self):
-		uinRegexYN = input('Would you like to use a built-in regex pattern, or provide your own? Y/N (N)\npygrep>> ')
-		if uinRegexYN == '' or str.upper(uinRegexYN) == 'N' or str.upper(uinRegexYN) == 'NO':
+		uinRegexYN = input('Would you like to use a built-in regex pattern. Y/N (Y)\npygrep>> ')
+		if str.upper(uinRegexYN) == 'N' or str.upper(uinRegexYN) == 'NO':
 			self.uinBuiltInYN = False
 			uinRegex = input('What is the regex pattern to search with?\npygrep>> ')
 			self.uinregexPattern = uinRegex
-		elif str.upper(uinRegexYN) == 'Y' or str.upper(uinRegexYN) == 'YES':
+		elif uinRegexYN == '' or str.upper(uinRegexYN) == 'Y' or str.upper(uinRegexYN) == 'YES':
 			self.uinBuiltInYN = True
 		else:
 			print('Invalid input, ' + uinRegexYN + '  please try again')
@@ -83,7 +84,11 @@ class uInput:
 
 	def uinOutFile(self):
 		uinOutYN = input('Would you like to save the output to a file, or just display it on the screen?\n1 = File\n2 = Screen\n3 = Both \n(Screen) \npygrep>> ')
-		if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F':
+		if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F' or uinOutYN == '3' or str.upper(uinOutYN) == 'BOTH' or str.upper(uinOutYN) == 'B':
+			if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F':
+				self.uinOutYN = 1
+			else:
+				self.uinOutYN = 3
 			uinOutFilePath = input('Provide output file path: ')
 			if os.path.isfile(uinOutFilePath) == True:
 				self.uinOutFilePath = uinOutFilePath
@@ -94,8 +99,12 @@ class uInput:
 					outFile = open(self.uinOutFilePath, 'w')
 				else:
 					print('Unrecognized option (' + overwrite + ') please try again.')
-			else:
-				pass
+		elif uinOutYN == '2' or str.upper(uinOutYN) == ' SCREEN' or str.upper(uinOutYN) == 'S':
+			self.uinOutFile = 2
+			pass
+		else:
+			print('Invalid option, please try again.')
+			self.uinOutFile()
 
 	def debug(self):
 		if cmdOpt.debug == True:
