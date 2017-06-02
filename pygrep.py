@@ -99,7 +99,7 @@ class uInput:
 					outFile = open(self.uinOutFilePath, 'w')
 				else:
 					print('Unrecognized option (' + overwrite + ') please try again.')
-		elif uinOutYN == '2' or str.upper(uinOutYN) == ' SCREEN' or str.upper(uinOutYN) == 'S':
+		elif uinOutYN == '2' or str.upper(uinOutYN) == 'SCREEN' or str.upper(uinOutYN) == 'S':
 			self.uinOutFile = 2
 			pass
 		else:
@@ -109,8 +109,7 @@ class uInput:
 	def debug(self):
 		if cmdOpt.debug == True:
 			print('\nos: ' + str(self.os) + '\npwd: ' + str(self.pwd) + '\nuInFile: ' + str(self.uInFile) + '\nslashdir: ' + str(self.slashdir) + '\nconfFile ' + str(self.confFile) + '\nself.builtinDict' + str(self.builtinDict))
-		else:
-			pass
+			return
 
 class regex(uInput):
 	def __init__(self):
@@ -147,18 +146,19 @@ class regex(uInput):
 				self.collectResp()
 		else:
 			self.regexPattern = uIn.uinregexPattern
+			return
 
 	def _regex(self, pattern):
 		self.openSearchFile = open(self.inFile,'r').read()
 		getregexp = re.findall(pattern,self.openSearchFile)
 		print('Found: ' + str(getregexp))
+		return
 
 	def debug(self):
 		if cmdOpt.debug == True:
 			print('\nself.regexPattern: ' + self.regexPattern + '\nself.builtinPattern: ' + str(self.builtinPattern))
 			print('Running re.findall:' + '\n\tpattern: ' + str(self.regexPattern) + '\n\tinFile: ' + str(self.inFile) + '\n\topenSearchFile: ' + str(self.openSearchFile))
-		else:
-			pass
+			return
 
 class CommandLineOptions:
 	'Allow for optional commandl-line input'
@@ -174,6 +174,7 @@ class CommandLineOptions:
 		parser.add_argument('-debug', help='Print debugging information',action='store_true')
 		args = parser.parse_args()
 		self.debug = args.debug
+		return
 
 	def getdebug(self):
 		return(self.debug)
@@ -182,8 +183,7 @@ class CommandLineOptions:
 		if self.debug == True:
 			print('\n--CommandLineOptionsDebug--')
 			print('self.debug: ' + str(self.debug))
-		else:
-			pass
+			return
 
 
 cmdOpt = CommandLineOptions()
