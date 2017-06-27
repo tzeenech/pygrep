@@ -16,13 +16,14 @@ class uInput:
 		self.pickPattern = None
 		self.uinOutFilePath = None
 		self.uinOutYN = None
-		self.openOutFile = None
+		self.outFileW = None
 		self.builtinDict = {}
 		self.setOS()
 		self.setPWD()
 		self.setslashdir()
 		self._openConfFile()
 		self._uinFile()
+		self.displayChoice()
 		self.uinOutFile()
 		self._uinRegex()
 		self.debug()
@@ -83,34 +84,48 @@ class uInput:
 			print('Invalid input, ' + uinRegexYN + '  please try again')
 			self._uinRegex()
 
+	def displayChoice(self):
+		uinOutYN = input('Would you like to save the output to a file, display it on the screen, or do both?\n1 = File Only\n2 = Screen Only\n3 = Both\n[Screen] pygrep>> ')
+		if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F':
+			self.uinOutYN = 1
+		elif uinOutYN == '2' or str.upper(uinOutYN) == 'SCREEN' or str.upper(uinOutYN) == 'S' or uinOutYN == '':
+			self.uinOutYN = 2
+			return
+		elif uinOutYN == '3' or str.upper(uinOutYN) == 'BOTH' or str.upper(uinOutYN) == 'B':
+			self.uinOutYN = 3
+		else:
+			print('Invalid input, please try again.')
+			self.displayChoice()
+
 	def uinOutFile(self):
-		uinOutYN = input('Would you like to save the output to a file, or just display it on the screen?\n1 = File\n2 = Screen\n3 = Both \n(Screen) \npygrep>> ')
-		if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F' or uinOutYN == '3' or str.upper(uinOutYN) == 'BOTH' or str.upper(uinOutYN) == 'B':
-			if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F':
-				self.uinOutYN = 1
-			else:
-				self.uinOutYN = 3
-			uinOutFilePath = input('Provide output file path: ')
+		if self.uinOutYN == 1 or self.uinOutYN == 3:
+			uinOutFilePath = input('Provide output file path\npygrep>> ')
 			if os.path.isfile(uinOutFilePath) == True:
 				self.uinOutFilePath = uinOutFilePath
 				overwrite = input('That file exists (' + uinOutFilePath + '), overwrite? Y/N (N)\npygrep>> ')
 				if overwrite == '' or str.upper(overwrite) == 'N' or str.upper(overwrite) == 'NO':
-					self.uinOutFile()
+					newFileYN = input('Would you like to append to the file, or provide a new output path?\n1 = Append\n2 = New Path\n[new file] pygrep>> ')
+					if newFileYN == '1' or str.upper(newFileYN) == 'APPEND' or str.upper(newFileYN) == 'A':
+						self.outFileW = False
+						return
+					else:
+						self.uinOutFile()
 				elif str.upper(overwrite) == 'Y' or str.upper(overwrite) == 'YES':
-					outFile = open(self.uinOutFilePath, 'w')
+					self.outFileW = True
+					return
 				else:
-					print('Unrecognized option (' + overwrite + ') please try again.')
+					print('Unrecognized input (' + overwrite + ') please try again.')
+					self.uinoutFile()
 			else:
 				self.uinOutFilePath = uinOutFilePath
+				self.outFileW = True
 				print('uinOutFilePath: ' + self.uinOutFilePath)
-				self.openOutFile = open(self.uinOutFilePath, 'w')
-				print('openOutFile: ' + str(self.openOutFile))
-		elif uinOutYN == '2' or str.upper(uinOutYN) == ' SCREEN' or str.upper(uinOutYN) == 'S':
+		elif self.uinOutYN == 2:
 			self.uinOutFile = 2
-			pass
+			return
 		else:
-			print('Invalid option, please try again.')
-			self.uinOutFile()
+			print('Invalid value of self.uinOutYN, please review coding.\nuinOutYN: ' + uinOutYN)
+			self.displayChoice()
 
 	def debug(self):
 		if cmdOpt.debug == True:
@@ -126,6 +141,7 @@ class regex(uInput):
 		self.openSearchFile = None
 		self.inRegex = None
 		self.inFile = None
+		self.openType = None
 		self.pullInDict()
 		self.setinFile()
 		self.collectResp()
@@ -157,22 +173,33 @@ class regex(uInput):
 	def _regex(self, pattern):
 		self.openSearchFile = open(self.inFile,'r').read()
 		getregexp = re.findall(pattern,self.openSearchFile)
+		if uIn.outFileW != None:
+			if uIn.outFileW == True:
+				self.openType = 'w'
+			else:
+				self.openType = 'a'
+			print()
 		if uIn.uinOutYN == 1:
-			for result in getregexp:
-				uIn.openOutFile = result + '\n'
+			with open(uIn.uinOutFilePath, self.openType) as outFile:
+				for result in getregexp:
+					outFile.write('{}\n'.format(result))
+			outFile.close
 		elif uIn.uinOutYN == 2:
-			for result in getregexp:
-				print('Found: ' + str(getregexp))
+				print('Found:\n')
+				for result in getregexp:
+					print('{}\n'.format(result))
 		elif uIn.uinOutYN == 3:
 			print('Found: ' + str(getregexp))
-			for result in getregexp:
-				uIn.openOutFile = result + '\n'
+			with open(uIn.uinOutFilePath, self.openType) as outFile:
+				for result in getregexp:
+					outFile.write('{}\n'.format(result))
+			outFile.close
 		else:
 			pass
 	def debug(self):
 		if cmdOpt.debug == True:
 			print('\nself.regexPattern: ' + self.regexPattern + '\nself.builtinPattern: ' + str(self.builtinPattern))
-			print('Running re.findall:' + '\n\tpattern: ' + str(self.regexPattern) + '\n\tinFile: ' + str(self.inFile) + '\n\topenSearchFile: ' + str(self.openSearchFile))
+			print('Running re.findall:' + '\n\tpattern: ' + str(self.regexPattern) + '\n\tinFile: ' + str(self.inFile) + '\n\topenSearchFile: ' + str(self.openSearchFile) + '\nopenType: ' + self.openType)
 		else:
 			pass
 
