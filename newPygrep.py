@@ -11,9 +11,12 @@ class FileHandler:
 		self.filename = None
 		self.delimiter = None
 		self.fileExists = False
+		self.openType = None
+		self.openedFile = None
 		self.OSCheck(fullpath)
 		self.separateFilePath(fullpath,self.delimiter)
 		self.exists(fullpath)
+		#self.openFile(fullpath,self.openType)
 	
 	def OSCheck(self,fullpath):
 		regexdPath = re.findall('^/',fullpath)
@@ -33,6 +36,11 @@ class FileHandler:
 	def exists(self,fullpath):
 		if os.path.isfile(fullpath) == True:
 			self.fileExists = True
+	
+	def openFile(self,fullpath,openType):
+		self.openedFile = open(fullpath,openType)
+		
+		
 
 #testpath = 'c:\program files\veritas\netbackup\bp.conf'
 #testpath = '/usr/openv/netbackup/bp.conf'
@@ -43,3 +51,5 @@ test = FileHandler(uInput)
 print('path: ' + test.pathname)
 print('filename: ' + test.filename)
 print('file exists: ' + str(test.fileExists))
+test.openFile('/usr/openv/netbackup/bp.conf','r')
+print(test.openedFile.read())
