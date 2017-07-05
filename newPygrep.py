@@ -23,11 +23,14 @@ class FileHandler:
 		if  regexdPath != []:
 			self.delimiter = '/'	
 		else:
-			self.delimiter = '\\'
+			self.delimiter = r'\\'
 
 	def separateFilePath(self,fullpath,delimiter):
+		print('fullpath: ' + fullpath)
+		print('delimiter: ' + delimiter)
 		#regexP = '(' + delimiter + '.+' + delimiter + ')(.+)'
 		regexP = '(' + delimiter + ')'
+		print('regexP: ' + regexP)
 		regexdPath = re.split(regexP,fullpath)
 		lastfield = len(regexdPath) - 1 
 		self.filename = regexdPath[lastfield]
@@ -54,5 +57,6 @@ test = FileHandler(uInput)
 print('path: ' + test.pathname)
 print('filename: ' + test.filename)
 print('file exists: ' + str(test.fileExists))
-test.openFile(test.pathname + test.filename,test.openType)
+fp = test.pathname + test.filename
+test.openFile(fp,test.openType)
 print(test.openedFile.read())
