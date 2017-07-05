@@ -36,6 +36,9 @@ class FileHandler:
 	def exists(self,fullpath):
 		if os.path.isfile(fullpath) == True:
 			self.fileExists = True
+			self.openType = 'r'
+		else:
+			self.openType = 'w'
 	
 	def openFile(self,fullpath,openType):
 		self.openedFile = open(fullpath,openType)
@@ -51,5 +54,5 @@ test = FileHandler(uInput)
 print('path: ' + test.pathname)
 print('filename: ' + test.filename)
 print('file exists: ' + str(test.fileExists))
-test.openFile('/usr/openv/netbackup/bp.conf','r')
+test.openFile(test.pathname + test.filename,test.openType)
 print(test.openedFile.read())
