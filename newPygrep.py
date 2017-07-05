@@ -46,17 +46,39 @@ class FileHandler:
 	def openFile(self,fullpath,openType):
 		self.openedFile = open(fullpath,openType)
 		
-		
+class config:
+	
+	def __init__(self,pygrepconfPath):
+		self.openpygrepCONF = fh.openFile(pygrepconfPath,'r')
+		self.debug()
+	
+	def debug(self):
+		#print('--config.test--\npathPYGREPCONF: ' + str(self.openpygrepCONF))
+		print('\n' + str(self.openpygrepCONF))
+	
+
+class regex:
+	
+	def __init__(self):
+		pass
+	
+	def createPattern(self):
+		pass
 
 #testpath = 'c:\program files\veritas\netbackup\bp.conf'
 #testpath = '/usr/openv/netbackup/bp.conf'
 
+
 uInput = input('What is the path to the file?\n>> ')
-test = FileHandler(uInput)
-#test = FileHandler(testpath)
-print('path: ' + test.pathname)
-print('filename: ' + test.filename)
-print('file exists: ' + str(test.fileExists))
-fp = test.pathname + test.filename
-test.openFile(fp,test.openType)
-print(test.openedFile.read())
+fh = FileHandler(uInput)
+print('path: ' + fh.pathname)
+print('filename: ' + fh.filename)
+print('file exists: ' + str(fh.fileExists))
+
+pygrep_conf = os.getcwd() + fh.delimiter + 'pygrep.conf'
+cfg = config(pygrep_conf)
+
+fp = fh.pathname + fh.filename
+fh.openFile(fp,fh.openType)
+print(fh.openedFile.read())
+
