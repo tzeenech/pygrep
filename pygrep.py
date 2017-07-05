@@ -61,65 +61,100 @@ class uInput:
 			self.openConfFile = open(self.confFile, 'a')
 
 	def _uinFile(self):
-		uInFile = input('What file would you like to search through?\nPlease provide the full path if the file is not in the current directory, \n"' + self.pwd + '."\npygrep>> ')
-		if os.path.isfile(uInFile) != True:
-			pwduInFile = self.pwd + uInFile
-			if os.path.isfile(pwduInFile) != True:
-				print('The file path provided,' + '(' + self.pwd + ')' + uInFile + ' does not exist, please try again.')
-				self._uinFile()
+		if cmdOpt.inFile != None:
+			if os.path.isfile(cmdOpt.inFile) != True:
+				pwduInFile = self.pwd + cmdOpt.inFile
+				if os.path.isfile(pwduInFile) != True:
+					print('Invalid input file path, ' + cmdOpt.inFile + '.')
+					quit()
+				else:
+					self.uInFile = pwduInFile
 			else:
-				self.uInFile = pwduInFile
+				self.uInFile = cmdOpt.inFile
 		else:
-			self.uInFile = uInFile
+			uInFile = input('What file would you like to search through?\nPlease provide the full path if the file is not in the current directory, \n"' + self.pwd + '."\npygrep>> ')
+			if os.path.isfile(uInFile) != True:
+				pwduInFile = self.pwd + uInFile
+				if os.path.isfile(pwduInFile) != True:
+					print('The file path provided,' + '(' + self.pwd + ')' + uInFile + ' does not exist, please try again.')
+					self._uinFile()
+				else:
+					self.uInFile = pwduInFile
+			else:
+				self.uInFile = uInFile
 
 	def _uinRegex(self):
-		uinRegexYN = input('Would you like to use a built-in regex pattern. Y/N (Y)\npygrep>> ')
-		if str.upper(uinRegexYN) == 'N' or str.upper(uinRegexYN) == 'NO':
-			self.uinBuiltInYN = False
-			uinRegex = input('What is the regex pattern to search with?\npygrep>> ')
-			self.uinregexPattern = uinRegex
-		elif uinRegexYN == '' or str.upper(uinRegexYN) == 'Y' or str.upper(uinRegexYN) == 'YES':
+		if cmdOpt.rn != None:
 			self.uinBuiltInYN = True
+			self.uinregexPattern = cmdOpt.rn
+		elif cmdOpt.rp != None:
+			self.uinBuiltInYN = False
+			self.uinregexPattern = cmdOpt.rp
 		else:
-			print('Invalid input, ' + uinRegexYN + '  please try again')
-			self._uinRegex()
+			uinRegexYN = input('Would you like to use a built-in regex pattern. Y/N (Y)\npygrep>> ')
+			if str.upper(uinRegexYN) == 'N' or str.upper(uinRegexYN) == 'NO':
+				self.uinBuiltInYN = False
+				uinRegex = input('What is the regex pattern to search with?\npygrep>> ')
+				self.uinregexPattern = uinRegex
+			elif uinRegexYN == '' or str.upper(uinRegexYN) == 'Y' or str.upper(uinRegexYN) == 'YES':
+				self.uinBuiltInYN = True
+			else:
+				print('Invalid input, ' + uinRegexYN + '  please try again')
+				self._uinRegex()
 
 	def displayChoice(self):
-		uinOutYN = input('Would you like to save the output to a file, display it on the screen, or do both?\n1 = File Only\n2 = Screen Only\n3 = Both\n[Screen] pygrep>> ')
-		if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F':
-			self.uinOutYN = 1
-		elif uinOutYN == '2' or str.upper(uinOutYN) == 'SCREEN' or str.upper(uinOutYN) == 'S' or uinOutYN == '':
-			self.uinOutYN = 2
-			return
-		elif uinOutYN == '3' or str.upper(uinOutYN) == 'BOTH' or str.upper(uinOutYN) == 'B':
+		if cmdOpt.outFile != None and cmdOpt.screen == True:
 			self.uinOutYN = 3
+		elif cmdOpt.outFile != None and cmdOpt.screen == False:
+			self.uinOutYN = 1
+		elif cmdOpt.outFile == None and cmdOpt.screen == True:
+			self.uinOutYN = 2
 		else:
-			print('Invalid input, please try again.')
-			self.displayChoice()
+			uinOutYN = input('Would you like to save the output to a file, display it on the screen, or do both?\n1 = File Only\n2 = Screen Only\n3 = Both\n[Screen] pygrep>> ')
+			if uinOutYN == '1' or str.upper(uinOutYN) == 'FILE' or str.upper(uinOutYN) == 'F':
+				self.uinOutYN = 1
+			elif uinOutYN == '2' or str.upper(uinOutYN) == 'SCREEN' or str.upper(uinOutYN) == 'S' or uinOutYN == '':
+				self.uinOutYN = 2
+				return
+			elif uinOutYN == '3' or str.upper(uinOutYN) == 'BOTH' or str.upper(uinOutYN) == 'B':
+				self.uinOutYN = 3
+			else:
+				print('Invalid input, please try again.')
+				self.displayChoice()
 
 	def uinOutFile(self):
 		if self.uinOutYN == 1 or self.uinOutYN == 3:
-			uinOutFilePath = input('Provide output file path\npygrep>> ')
-			if os.path.isfile(uinOutFilePath) == True:
-				self.uinOutFilePath = uinOutFilePath
-				overwrite = input('That file exists (' + uinOutFilePath + '), overwrite? Y/N (N)\npygrep>> ')
-				if overwrite == '' or str.upper(overwrite) == 'N' or str.upper(overwrite) == 'NO':
-					newFileYN = input('Would you like to append to the file, or provide a new output path?\n1 = Append\n2 = New Path\n[new file] pygrep>> ')
-					if newFileYN == '1' or str.upper(newFileYN) == 'APPEND' or str.upper(newFileYN) == 'A':
-						self.outFileW = False
+			if cmdOpt.outFile != None:
+				if os.path.isfile(cmdOpt.outFile) == True and cmdOpt.force == True:
+					self.uinOutFilePath = cmdOpt.outFile
+				elif os.path.isfile(cmdOpt.outFile) == True and cmdOpt.force == False:
+					print('The output file, ' + cmdOpt.outFile + ', already exists. Please either force (-f) or provide another outfile name.')
+					quit()
+				elif os.path.isfile(cmdOpt.outFile) == False:
+					self.uinOutFilePath = cmdOpt.outFile
+					self.outFileW = True
+			else:
+				uinOutFilePath = input('Provide output file path\npygrep>> ')
+				if os.path.isfile(uinOutFilePath) == True:
+					self.uinOutFilePath = uinOutFilePath
+					overwrite = input('That file exists (' + uinOutFilePath + '), overwrite? Y/N (N)\npygrep>> ')
+					if overwrite == '' or str.upper(overwrite) == 'N' or str.upper(overwrite) == 'NO':
+						newFileYN = input('Would you like to append to the file, or provide a new output path?\n1 = Append\n2 = New Path\n[new file] pygrep>> ')
+						if newFileYN == '1' or str.upper(newFileYN) == 'APPEND' or str.upper(newFileYN) == 'A':
+							self.outFileW = False
+							return
+						else:
+							self.uinOutFile()
+					elif str.upper(overwrite) == 'Y' or str.upper(overwrite) == 'YES':
+						self.outFileW = True
 						return
 					else:
-						self.uinOutFile()
-				elif str.upper(overwrite) == 'Y' or str.upper(overwrite) == 'YES':
-					self.outFileW = True
-					return
+						print('Unrecognized input (' + overwrite + ') please try again.')
+						self.uinoutFile()
 				else:
-					print('Unrecognized input (' + overwrite + ') please try again.')
-					self.uinoutFile()
-			else:
-				self.uinOutFilePath = uinOutFilePath
-				self.outFileW = True
-				print('uinOutFilePath: ' + self.uinOutFilePath)
+					self.uinOutFilePath = uinOutFilePath
+					self.outFileW = True
+					print('uinOutFilePath: ' + self.uinOutFilePath)
 		elif self.uinOutYN == 2:
 			self.uinOutFile = 2
 			return
@@ -206,7 +241,13 @@ class regex(uInput):
 class CommandLineOptions:
 	'Allow for optional commandl-line input'
 	def __init__(self):
-		self.debug = ''
+		self.debug = None
+		self.inFile = None
+		self.outFile = None
+		self.rp = None
+		self.rn = None
+		self.screen = False
+		self.force = False
 		self.switches()
 		self.CommandLineOptionsDebug()
 
@@ -215,8 +256,20 @@ class CommandLineOptions:
 		parser = argparse.ArgumentParser()
 		argparse.ArgumentParser(prog='pygrep.py', prefix_chars='-/')
 		parser.add_argument('-debug', help='Print debugging information',action='store_true')
+		parser.add_argument('-inf', help='Input file',action='store')
+		parser.add_argument('-of', help='Output file',action='store')
+		parser.add_argument('-rp', help='RegexPattern: Provide a regex pattern',action='store')
+		parser.add_argument('-rn', help='RegexName: Use a regex from the pygrep.conf file with the given name',action='store')
+		parser.add_argument('-s', help='Display output to screen',action='store_true')
+		parser.add_argument('-f', help='Force -- Allow overwrites of existing files',action='store_true')
 		args = parser.parse_args()
 		self.debug = args.debug
+		self.inFile = args.inf
+		self.outFile = args.of
+		self.rp = args.rp
+		self.rn = args.rn
+		self.screen = args.s
+		self.force = args.f
 
 	def getdebug(self):
 		return(self.debug)
