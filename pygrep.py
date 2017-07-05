@@ -53,10 +53,15 @@ class uInput:
 		self.confFile = self.pwd + self.slashdir + 'pygrep.conf'
 		if os.path.isfile(self.confFile) == True:
 			self.openConfFile = open(self.confFile, 'r')
-			print('Found an existing pygrep.conf file...\n')
-			for line in self.openConfFile.readlines():
-				splitline = line.split()
-				self.builtinDict[(splitline[0])] = ','.join(splitline[1:])
+			if cmdOpt.debug == True:
+				print('Found an existing pygrep.conf file...\n')
+				for line in self.openConfFile.readlines():
+					splitline = line.split()
+					self.builtinDict[(splitline[0])] = ','.join(splitline[1:])
+			else:
+				for line in self.openConfFile.readlines():
+					splitline = line.split()
+					self.builtinDict[(splitline[0])] = ','.join(splitline[1:])
 		else:
 			self.openConfFile = open(self.confFile, 'a')
 
@@ -127,6 +132,7 @@ class uInput:
 			if cmdOpt.outFile != None:
 				if os.path.isfile(cmdOpt.outFile) == True and cmdOpt.force == True:
 					self.uinOutFilePath = cmdOpt.outFile
+					self.outFileW = True
 				elif os.path.isfile(cmdOpt.outFile) == True and cmdOpt.force == False:
 					print('The output file, ' + cmdOpt.outFile + ', already exists. Please either force (-f) or provide another outfile name.')
 					quit()
@@ -184,14 +190,21 @@ class regex(uInput):
 		self.debug()
 
 	def pullInDict(self):
-		print('uIn.builtinDict: ' + str(uIn.builtinDict))
+		if cmdOpt.debug == True:
+			print('uIn.builtinDict: ' + str(uIn.builtinDict))
 		self.builtinPattern = uIn.builtinDict
 
 	def setinFile(self):
 		self.inFile = uIn.uInFile
 
 	def collectResp(self):
-		if uIn.uinBuiltInYN == True:
+		if uIn.uinBuiltInYN == True and cmdOpt.rn != None:
+			try:
+				self.regexPattern = self.builtinPattern[cmdOpt.rn]
+			except:
+				print('Regex pattern, ' + cmdOpt.rn + ', is not a valid pattern name.')
+				quit()
+		elif uIn.uinBuiltInYN == True and cmdOpt.rn == None:
 			print(self.builtinPattern)
 			print('\n')
 			for k, v in self.builtinPattern.items():
@@ -202,8 +215,12 @@ class regex(uInput):
 			except:
 				print('Invalid input ' + self.pickPattern + '. Please try again.\n')
 				self.collectResp()
-		else:
+		elif uIn.uinBuiltInYN == False and cmdOpt.rp == None:
 			self.regexPattern = uIn.uinregexPattern
+		elif uIn.uinBuiltInYN == False and cmdOpt.rp != None:
+			self.regexPattern = cmdOpt.rp
+		else:
+			print('I missed an possible if statement.')
 
 	def _regex(self, pattern):
 		self.openSearchFile = open(self.inFile,'r').read()
@@ -258,7 +275,7 @@ class CommandLineOptions:
 		parser.add_argument('-debug', help='Print debugging information',action='store_true')
 		parser.add_argument('-inf', help='Input file',action='store')
 		parser.add_argument('-of', help='Output file',action='store')
-		parser.add_argument('-rp', help='RegexPattern: Provide a regex pattern',action='store')
+		parser.add_argument('-rp', help='RegexPattern: Provide a regex pattern enclosed in single-quotes',action='store')
 		parser.add_argument('-rn', help='RegexName: Use a regex from the pygrep.conf file with the given name',action='store')
 		parser.add_argument('-s', help='Display output to screen',action='store_true')
 		parser.add_argument('-f', help='Force -- Allow overwrites of existing files',action='store_true')
