@@ -112,7 +112,7 @@ class uInput:
 			self.uinOutYN = 3
 		elif cmdOpt.outFile != None and cmdOpt.screen == False:
 			self.uinOutYN = 1
-		elif cmdOpt.outFile == None and cmdOpt.screen == True:
+		elif cmdOpt.outFile == None and cmdOpt.screen != None:
 			self.uinOutYN = 2
 		else:
 			uinOutYN = input('Would you like to save the output to a file, display it on the screen, or do both?\n1 = File Only\n2 = Screen Only\n3 = Both\n[Screen] pygrep>> ')
