@@ -17,18 +17,18 @@ class FileHandler:
 	
 	def OSCheck(self,fullpath):
 		regexdPath = re.findall('^/',fullpath)
-		print(regexdPath)
 		if  regexdPath != []:
 			self.delimiter = '/'	
 		else:
 			self.delimiter = '\\'
 
 	def separateFilePath(self,fullpath,delimiter):
-		regexP = '(' + delimiter + '.+' + delimiter + ')(.+)'
+		#regexP = '(' + delimiter + '.+' + delimiter + ')(.+)'
+		regexP = '(' + delimiter + ')'
 		regexdPath = re.split(regexP,fullpath)
-		print(regexdPath)
-		self.pathname = regexdPath[1]
-		self.filename = regexdPath[2]
+		lastfield = len(regexdPath) - 1 
+		self.filename = regexdPath[lastfield]
+		self.pathname = ''.join(regexdPath[0:lastfield])
 	
 	def exists(self,fullpath):
 		if os.path.isfile(fullpath) == True:
@@ -40,5 +40,6 @@ class FileHandler:
 uInput = input('What is the path to the file?\n>> ')
 test = FileHandler(uInput)
 #test = FileHandler(testpath)
-print(test.pathname + test.filename)
-print(test.fileExists)
+print('path: ' + test.pathname)
+print('filename: ' + test.filename)
+print('file exists: ' + str(test.fileExists))
