@@ -230,7 +230,6 @@ class regex(uInput):
 				self.openType = 'w'
 			else:
 				self.openType = 'a'
-			print()
 		if uIn.uinOutYN == 1:
 			with open(uIn.uinOutFilePath, self.openType) as outFile:
 				for result in getregexp:
