@@ -16,7 +16,6 @@ class FileHandler:
 		self.OSCheck(fullpath)
 		self.separateFilePath(fullpath,self.delimiter)
 		self.exists(fullpath)
-		#self.openFile(fullpath,self.openType)
 	
 	def OSCheck(self,fullpath):
 		regexdPath = re.findall('^/',fullpath)
@@ -54,8 +53,8 @@ class FileHandler:
 		for line in self.openedFile.readlines():
 			print(line)
 			
-	def writeFile(self,foo):
-		self.openedFile.write(foo)
+	def writeFile(self,fileContent):
+		self.openedFile.write(fileContent)
 	
 	def seekFile(self):
 		self.openedFile.seek(0)
