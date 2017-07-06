@@ -10,7 +10,7 @@ class FileHandler:
 		self.pathname = None
 		self.filename = None
 		self.delimiter = None
-		self.fileExists = False
+		self.filePreExists = None
 		self.openType = None
 		self.openedFile = None
 		self.OSCheck(fullpath)
@@ -38,9 +38,10 @@ class FileHandler:
 	
 	def exists(self,fullpath):
 		if os.path.isfile(fullpath) == True:
-			self.fileExists = True
+			self.filePreExists = True
 			self.openType = 'r'
 		else:
+			self.filePreExists = False
 			self.openType = 'w+'
 	
 	def openFile(self,fullpath,openType):
@@ -77,7 +78,7 @@ uInput = input('What is the path to the file?\n>> ')
 fh = FileHandler(uInput)
 print('path: ' + fh.pathname)
 print('filename: ' + fh.filename)
-print('file exists: ' + str(fh.fileExists))
+print('file pre-existing: ' + str(fh.filePreExists))
 
 pygrep_conf = os.getcwd() + fh.delimiter + 'pygrep.conf'
 #cfg = config(pygrep_conf)
@@ -86,5 +87,6 @@ fp = fh.pathname + fh.filename
 fh.openFile(fp,fh.openType)
 file_text = 'This is a test\nPlease continue testing.\n'
 fh.openedFile.write(file_text)
-print(fh.openedFile.read())
+for line in fh.openedFile.readline():
+	print(line)
 fh.closeFile(fh.openedFile)
