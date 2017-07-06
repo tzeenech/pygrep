@@ -53,6 +53,12 @@ class FileHandler:
 	def readFile(self):
 		for line in self.openedFile.readlines():
 			print(line)
+			
+	def writeFile(self,foo):
+		self.openedFile.write(foo)
+	
+	def seekFile(self):
+		self.openedFile.seek(0)
 		
 """		
 class config:
@@ -90,8 +96,8 @@ pygrep_conf = os.getcwd() + fh.delimiter + 'pygrep.conf'
 fp = fh.pathname + fh.filename
 fh.openFile(fp,fh.openType)
 file_text = 'This is a test\nPlease continue testing.\n'
-fh.openedFile.write(file_text)
-fh.openedFile.seek(0)
+fh.writeFile(file_text)
+fh.seekFile()
 print('\n--openedFile contents below--')
 fh.readFile()
 fh.closeFile()
