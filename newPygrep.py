@@ -69,16 +69,25 @@ class config:
 	def debug(self):
 		#print('--config.test--\npathPYGREPCONF: ' + str(self.openpygrepCONF))
 		print('\n' + str(self.openpygrepCONF))
-	
+"""	
 
 class regex:
 	
 	def __init__(self):
-		pass
+		self.dictRegex = {}
+		self.findall = None
 	
-	def createPattern(self):
-		pass
-"""
+	def createPattern(self,name,pattern):
+		self.dictRegex[name] = pattern
+	
+	def listPatterns(self):
+		print('\nName\tPattern\n')
+		for k, v in self.dictRegex.items():
+			print(k + '\t' + v)
+	
+	def employPattern(self,name,searchFile):
+		self.findall = re.findall(self.dictRegex[name],searchFile)
+
 #testpath = 'c:\program files\veritas\netbackup\bp.conf'
 #testpath = '/usr/openv/netbackup/bp.conf'
 
@@ -99,4 +108,10 @@ fh.writeFile(file_text)
 fh.seekFile()
 print('\n--openedFile contents below--')
 fh.readFile()
+
+regX = regex()
+regX.createPattern('test','.+')
+regX.listPatterns()
+print(regX.employPattern('test',fh.readFile()))
+
 fh.closeFile()
