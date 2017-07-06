@@ -41,11 +41,15 @@ class FileHandler:
 			self.fileExists = True
 			self.openType = 'r'
 		else:
-			self.openType = 'w'
+			self.openType = 'w+'
 	
 	def openFile(self,fullpath,openType):
 		self.openedFile = open(fullpath,openType)
 		
+	def closeFile(self,filehandle):
+		filehandle.close()
+		
+"""		
 class config:
 	
 	def __init__(self,pygrepconfPath):
@@ -64,7 +68,7 @@ class regex:
 	
 	def createPattern(self):
 		pass
-
+"""
 #testpath = 'c:\program files\veritas\netbackup\bp.conf'
 #testpath = '/usr/openv/netbackup/bp.conf'
 
@@ -76,9 +80,11 @@ print('filename: ' + fh.filename)
 print('file exists: ' + str(fh.fileExists))
 
 pygrep_conf = os.getcwd() + fh.delimiter + 'pygrep.conf'
-cfg = config(pygrep_conf)
+#cfg = config(pygrep_conf)
 
 fp = fh.pathname + fh.filename
 fh.openFile(fp,fh.openType)
+file_text = 'This is a test\nPlease continue testing.\n'
+fh.openedFile.write(file_text)
 print(fh.openedFile.read())
-
+fh.closeFile(fh.openedFile)
