@@ -87,6 +87,9 @@ fp = fh.pathname + fh.filename
 fh.openFile(fp,fh.openType)
 file_text = 'This is a test\nPlease continue testing.\n'
 fh.openedFile.write(file_text)
-for line in fh.openedFile.readline():
+#fh.closeFile(fh.openedFile)
+#fh.openFile(fp,'r')
+fh.openedFile.seek(0)
+for line in fh.openedFile.readlines():
 	print(line)
 fh.closeFile(fh.openedFile)
