@@ -47,8 +47,12 @@ class FileHandler:
 	def openFile(self,fullpath,openType):
 		self.openedFile = open(fullpath,openType)
 		
-	def closeFile(self,filehandle):
-		filehandle.close()
+	def closeFile(self):
+		self.openedFile.close()
+	
+	def readFile(self):
+		for line in self.openedFile.readlines():
+			print(line)
 		
 """		
 class config:
@@ -87,9 +91,7 @@ fp = fh.pathname + fh.filename
 fh.openFile(fp,fh.openType)
 file_text = 'This is a test\nPlease continue testing.\n'
 fh.openedFile.write(file_text)
-#fh.closeFile(fh.openedFile)
-#fh.openFile(fp,'r')
 fh.openedFile.seek(0)
-for line in fh.openedFile.readlines():
-	print(line)
-fh.closeFile(fh.openedFile)
+print('\n--openedFile contents below--')
+fh.readFile()
+fh.closeFile()
