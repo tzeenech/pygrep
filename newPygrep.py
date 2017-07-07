@@ -6,6 +6,14 @@ import argparse
 
 class FileHandler:
 	'For handling all file functions'
+	"""
+	pathname = None
+	filename = None
+	delimiter = None
+	filePreExists = None
+	openType = None
+	openedFile = None
+	"""
 	def __init__(self,fullpath):
 		self.pathname = None
 		self.filename = None
@@ -16,6 +24,7 @@ class FileHandler:
 		self.OSCheck(fullpath)
 		self.separateFilePath(fullpath,self.delimiter)
 		self.exists(fullpath)
+		self.fileContents = ""
 	
 	def OSCheck(self,fullpath):
 		regexdPath = re.findall('^/',fullpath)
@@ -51,7 +60,7 @@ class FileHandler:
 	
 	def readFile(self):
 		for line in self.openedFile.readlines():
-			print(line)
+			self.fileContents = self.fileContents + line
 		
 	def writeFile(self,fileContent):
 		self.openedFile.write(fileContent)
@@ -76,9 +85,10 @@ class config:
 
 class regex(FileHandler):
 	'For dealing with regex patterns: provide a one-time use pattern, add a pattern to pygrep.conf, and apply a pattern to a file'
+	
 	def __init__(self,fullpath):
 		super().__init__(fullpath)
-		self.serachFile = super().openFile(fullpath,super().openType)
+		self.openFile(fullpath,self.openType)
 		self.dictRegex = {}
 		self.pattern = None
 		self.findall = None
@@ -118,7 +128,14 @@ pbd.closeFile()
 brx.listPatterns()
 """
 brx = regex('pygrep.conf')
+brx.readFile()
 
+configList = re.findall('(.+)\s(.+)',brx.fileContents)
+
+for x,y in configList:
+	brx.createPattern(x,y)
+
+brx.listPatterns()
 
 # Get the file to search through
 uInput = input('What is the path to the file to search through?\n>> ')
