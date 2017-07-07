@@ -21,24 +21,26 @@ class FileHandler:
 		self.filePreExists = None
 		self.openType = None
 		self.openedFile = None
-		self.OSCheck(fullpath)
+		self.pwd = None
+		self.fileContents = ''
+		self.setPWD()
+		self.OSCheck(self.pwd)
 		self.separateFilePath(fullpath,self.delimiter)
 		self.exists(fullpath)
-		self.fileContents = ""
+
+		
+	def setPWD(self):
+		self.pwd = os.getcwd()
 	
-	def OSCheck(self,fullpath):
-		regexdPath = re.findall('^/',fullpath)
+	def OSCheck(self,pwdPath):
+		regexdPath = re.findall('^/',pwdPath)
 		if  regexdPath != []:
 			self.delimiter = '/'	
 		else:
 			self.delimiter = r'\\'
 
 	def separateFilePath(self,fullpath,delimiter):
-		print('fullpath: ' + fullpath)
-		print('delimiter: ' + delimiter)
-		#regexP = '(' + delimiter + '.+' + delimiter + ')(.+)'
 		regexP = '(' + delimiter + ')'
-		print('regexP: ' + regexP)
 		regexdPath = re.split(regexP,fullpath)
 		lastfield = len(regexdPath) - 1 
 		self.filename = regexdPath[lastfield]
@@ -99,7 +101,7 @@ class regex(FileHandler):
 	def listPatterns(self):
 		print('\nName\tPattern\n')
 		for k, v in self.dictRegex.items():
-			print(k + '\t' + v)
+			print(k + '\t' + v + '\n')
 	
 	def checkInPattern(self,NorP):
 		if self.dictRegex[NorP] == []:
@@ -117,51 +119,51 @@ class regex(FileHandler):
 
 
 # Build the built-in regex dictionary
-"""pygrep_conf = 'pygrep.conf'
-pbd = FileHandler(pygrep_conf)
-pbd.openFile(pygrep_conf,pbd.openType)
-configList = re.findall('(.+)\s(.+)',pbd.readFile())
-brx = regex()
-for x,y in configList:
-	brx.createPattern(x,y)
-pbd.closeFile()
-brx.listPatterns()
-"""
 brx = regex('pygrep.conf')
 brx.readFile()
-
-configList = re.findall('(.+)\s(.+)',brx.fileContents)
-
+configList = re.findall('(.+) (.+)',brx.fileContents)
 for x,y in configList:
 	brx.createPattern(x,y)
-
-brx.listPatterns()
 
 # Get the file to search through
 uInput = input('What is the path to the file to search through?\n>> ')
-fh = FileHandler(uInput)
-print('path: ' + fh.pathname)
-print('filename: ' + fh.filename)
-print('file pre-existing: ' + str(fh.filePreExists))
+inFile = FileHandler(uInput)
+print('path: ' + inFile.pathname)
+print('filename: ' + inFile.filename)
+print('file pre-existing: ' + str(inFile.filePreExists))
+fp = inFile.pathname + inFile.filename
+inFile.openFile(fp,'r')
+print('\n--openedFile contents below--')
+inFile.readFile()
+print(inFile.fileContents)
 
-fp = fh.pathname + fh.filename
-fh.openFile(fp,fh.openType)
-if fh.openType == 'r':
-	print('\n--openedFile contents below--')
-	print(fh.readFile())
-else:
-	file_text = 'This is a test\nPlease continue testing.\n'
-	fh.writeFile(file_text)
-	fh.seekFile()
-	print('\n--openedFile contents below--')
-	print(fh.readFile())
+# Create an output file
+#uOutput = input('What would you like to do with the results?\n1) Display on the Screen\n2)Write to file\n3)Both\n>> ')
+print('Creating output file in /tmp/file_test')
+uOutput = '/tmp/file_test'
+"""
+print('temporarily defaulting to both')
+outFile = FileHandler(uOutput)
+print('path: ' + outFile.pathname)
+print('filename: ' + outFile.filename)
+print('file pre-existing: ' + str(outFile.filePreExists))
+ofp = outFile.pathname + outFile.filename
+outFile.openFile(ofp,'w+')
+"""
 
-
-regX = regex()
-regX.createPattern('test','(.+)')
-regX.listPatterns()
+# Search the inFile with the regex pattern
+searchFile = regex(uOutput)
+brx.listPatterns()
 regPick = input('Enter the name of a pattern, or enter a regex pattern to search with.\n>> ')
-regX.employPattern(regPick,fh.openedFile.read())
-regX.showResults()
+brx.checkInPattern(regPick)
+searchFile.employPattern(brx.pattern,inFile.fileContents)
+searchFile.showResults()
 
-fh.closeFile()
+# Display output file contents
+print('\n--outFile contents below--')
+outFile.seek()
+outFile.readFile()
+print(outFile.fileContents)
+
+inFile.closeFile()
+searchFile.closeFile()
