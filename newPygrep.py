@@ -52,29 +52,33 @@ class FileHandler:
 	def readFile(self):
 		for line in self.openedFile.readlines():
 			print(line)
-			
+		
 	def writeFile(self,fileContent):
 		self.openedFile.write(fileContent)
 	
 	def seekFile(self):
 		self.openedFile.seek(0)
 		
-"""		
+"""
 class config:
 	
 	def __init__(self,pygrepconfPath):
 		self.openpygrepCONF = fh.openFile(pygrepconfPath,'r')
 		self.debug()
+		
+	def buildDefaultRegex:
+		
 	
 	def debug(self):
 		#print('--config.test--\npathPYGREPCONF: ' + str(self.openpygrepCONF))
 		print('\n' + str(self.openpygrepCONF))
-"""	
+"""
 
 class regex:
 	
 	def __init__(self):
 		self.dictRegex = {}
+		self.pattern = None
 		self.findall = None
 	
 	def createPattern(self,name,pattern):
@@ -85,33 +89,57 @@ class regex:
 		for k, v in self.dictRegex.items():
 			print(k + '\t' + v)
 	
-	def employPattern(self,name,searchFile):
-		self.findall = re.findall(self.dictRegex[name],searchFile)
+	def checkInPattern(self,NorP):
+		if self.dictRegex[NorP] == []:
+			self.pattern = NorP
+		else:
+			self.pattern = self.dictRegex[NorP]
+	
+	def employPattern(self,pick,searchFile):
+		self.checkInPattern(pick)
+		self.findall = re.findall(self.pattern,searchFile)
+		
+	def showResults(self):
+		for line in self.findall:
+			print(line)
 
-#testpath = 'c:\program files\veritas\netbackup\bp.conf'
-#testpath = '/usr/openv/netbackup/bp.conf'
 
+# Build the built-in regex dictionary
+pygrep_conf = os.getcwd() + pbd.delimiter + 'pygrep.conf'
+pbd = FileHandler(pygrep_conf)
+pbd.openFile(pygrep_conf,pbd.openType)
+configList = re.findall('(.+)\s(.+)',pbd.readFile())
+brx = regex()
+for x,y in configList:
+	brx.createPattern(x,y)
+pbd.closeFile()
+brx.listPatterns()
 
-uInput = input('What is the path to the file?\n>> ')
+# Get the file to search through
+uInput = input('What is the path to the file to search through?\n>> ')
 fh = FileHandler(uInput)
 print('path: ' + fh.pathname)
 print('filename: ' + fh.filename)
 print('file pre-existing: ' + str(fh.filePreExists))
 
-pygrep_conf = os.getcwd() + fh.delimiter + 'pygrep.conf'
-#cfg = config(pygrep_conf)
-
 fp = fh.pathname + fh.filename
 fh.openFile(fp,fh.openType)
-file_text = 'This is a test\nPlease continue testing.\n'
-fh.writeFile(file_text)
-fh.seekFile()
-print('\n--openedFile contents below--')
-fh.readFile()
+if fh.openType == 'r':
+	print('\n--openedFile contents below--')
+	print(fh.readFile())
+else:
+	file_text = 'This is a test\nPlease continue testing.\n'
+	fh.writeFile(file_text)
+	fh.seekFile()
+	print('\n--openedFile contents below--')
+	print(fh.readFile())
+
 
 regX = regex()
-regX.createPattern('test','.+')
+regX.createPattern('test','(.+)')
 regX.listPatterns()
-print(regX.employPattern('test',fh.readFile()))
+regPick = input('Enter the name of a pattern, or enter a regex pattern to search with.\n>> ')
+regX.employPattern(regPick,fh.openedFile.read())
+regX.showResults()
 
 fh.closeFile()
