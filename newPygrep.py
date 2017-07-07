@@ -5,7 +5,7 @@ import os
 import argparse
 
 class FileHandler:
-	
+	'For handling all file functions'
 	def __init__(self,fullpath):
 		self.pathname = None
 		self.filename = None
@@ -74,9 +74,11 @@ class config:
 		print('\n' + str(self.openpygrepCONF))
 """
 
-class regex:
-	
-	def __init__(self):
+class regex(FileHandler):
+	'For dealing with regex patterns: provide a one-time use pattern, add a pattern to pygrep.conf, and apply a pattern to a file'
+	def __init__(self,fullpath):
+		super().__init__(fullpath)
+		self.serachFile = super().openFile(fullpath,super().openType)
 		self.dictRegex = {}
 		self.pattern = None
 		self.findall = None
@@ -105,7 +107,7 @@ class regex:
 
 
 # Build the built-in regex dictionary
-pygrep_conf = os.getcwd() + pbd.delimiter + 'pygrep.conf'
+"""pygrep_conf = 'pygrep.conf'
 pbd = FileHandler(pygrep_conf)
 pbd.openFile(pygrep_conf,pbd.openType)
 configList = re.findall('(.+)\s(.+)',pbd.readFile())
@@ -114,6 +116,9 @@ for x,y in configList:
 	brx.createPattern(x,y)
 pbd.closeFile()
 brx.listPatterns()
+"""
+brx = regex('pygrep.conf')
+
 
 # Get the file to search through
 uInput = input('What is the path to the file to search through?\n>> ')
