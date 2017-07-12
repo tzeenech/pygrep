@@ -7,17 +7,18 @@ import argparse
 class FileHandler:
 	'For handling all file functions'
 
-	delimiter = 
-	
+	delimiter = self.delimiter
+	pwd = self.pwd
+
 	def __init__(self):
-		self.pathname = None
-		self.filename = None
+		#self.pathname = None
+		#self.filename = None
 		self.delimiter = None
-		self.filePreExists = None
-		self.openType = None
-		self.openedFile = None
+		#self.filePreExists = None
+		#self.openType = None
+		#self.openedFile = None
 		self.pwd = None
-		self.fileContents = ''
+		#self.fileContents = ''
 		self.setPWD()
 		self.OSCheck(self.pwd)
 		#self.separateFilePath(fullpath,self.delimiter)
@@ -26,14 +27,14 @@ class FileHandler:
 	def __init__(self,fullpath):
 		self.pathname = None
 		self.filename = None
-		self.delimiter = None
+		#self.delimiter = None
 		self.filePreExists = None
 		self.openType = None
 		self.openedFile = None
-		self.pwd = None
+		#self.pwd = None
 		self.fileContents = ''
-		self.setPWD()
-		self.OSCheck(self.pwd)
+		#self.setPWD()
+		#self.OSCheck(self.pwd)
 		self.separateFilePath(fullpath,self.delimiter)
 		self.exists(fullpath)
 
@@ -47,8 +48,8 @@ class FileHandler:
 		else:
 			self.delimiter = r'\\'
 
-	def separateFilePath(self,fullpath,delimiter):
-		regexP = '(' + delimiter + ')'
+	def separateFilePath(self,fullpath,slashdir):
+		regexP = '(' + slashdir + ')'
 		regexdPath = re.split(regexP,fullpath)
 		lastfield = len(regexdPath) - 1 
 		self.filename = regexdPath[lastfield]
