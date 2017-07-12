@@ -9,22 +9,32 @@ class Environment:
 		self.osType = None
 		self.pwd = None
 		self.slashdir = None
-		self.setOSTYPE()
 		self.setPWD()
-		self.setSLASHDIRECTION(self.osType)
+		self.setSLASHDIRECTION()
+		self.setOSTYPE()
 		self.debug()
-	
-	def setOSTYPE(self):
-		self.osType = os.name	
 	
 	def setPWD(self):
 		self.pwd = os.getcwd()
 
-	def setSLASHDIRECTION(self,OS):
-		if OS == 'nt':
+	def setSLASHDIRECTION(self):
+		"""if OS == 'nt':
 			self.slashdir = '\\'
 		else:
 			self.slashdir = '/'
+		"""
+		regexdPath = re.findall('^/',path)
+		if regexdPath != []:
+			self.slashdir = '/'
+		else:
+			self.slashdir = r'\\'
+
+	def setOSTYPE(self):
+		#self.osType = os.name
+		if self.slashdir == '/':
+			self.osType = 'posix'
+		else:
+			self.osType = 'nt'
 
 	def clearscreen(self):
 		if self.osType == 'nt':

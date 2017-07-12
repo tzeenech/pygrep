@@ -14,6 +14,7 @@ class FileHandler:
 	openType = None
 	openedFile = None
 	"""
+	
 	def __init__(self,fullpath):
 		self.pathname = None
 		self.filename = None
@@ -28,7 +29,6 @@ class FileHandler:
 		self.separateFilePath(fullpath,self.delimiter)
 		self.exists(fullpath)
 
-		
 	def setPWD(self):
 		self.pwd = os.getcwd()
 	
@@ -106,12 +106,14 @@ class regex(FileHandler):
 	def checkInPattern(self,NorP):
 		if self.dictRegex[NorP] == []:
 			self.pattern = NorP
+			print('If statement: ' + self.pattern)
 		else:
 			self.pattern = self.dictRegex[NorP]
+			print('Else statement: ' + self.pattern)
 	
-	def employPattern(self,pick,searchFile):
-		self.checkInPattern(pick)
-		self.findall = re.findall(self.pattern,searchFile)
+	def employPattern(self,pattern,searchFile):
+		#self.checkInPattern(pick)
+		self.findall = re.findall(pattern,searchFile)
 		
 	def showResults(self):
 		for line in self.findall:
@@ -155,7 +157,8 @@ outFile.openFile(ofp,'w+')
 searchFile = regex(uOutput)
 brx.listPatterns()
 regPick = input('Enter the name of a pattern, or enter a regex pattern to search with.\n>> ')
-brx.checkInPattern(regPick)
+brxregPick = brx.checkInPattern(regPick)
+print('brxregPick: ' + str(brxregPick))
 searchFile.employPattern(brx.pattern,inFile.fileContents)
 searchFile.showResults()
 
