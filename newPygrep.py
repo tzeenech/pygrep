@@ -61,11 +61,13 @@ class FileHandler:
 		self.openedFile.close()
 	
 	def readFile(self):
+		self.seekFile()
 		for line in self.openedFile.readlines():
 			self.fileContents = self.fileContents + line
 		
-	def writeFile(self,fileContent):
-		self.openedFile.write(fileContent)
+	def writeFile(self,FileContent):
+		self.seekFile()
+		self.openedFile.write(FileContent)
 	
 	def seekFile(self):
 		self.openedFile.seek(0)
@@ -92,8 +94,9 @@ class regex(FileHandler):
 		super().__init__(fullpath)
 		self.openFile(fullpath,self.openType)
 		self.dictRegex = {}
-		self.pattern = None
-		self.findall = None
+		self.pattern = ''
+		self.findall = ''
+		self.results = ''
 	
 	def createPattern(self,name,pattern):
 		self.dictRegex[name] = pattern
@@ -106,18 +109,22 @@ class regex(FileHandler):
 	def checkInPattern(self,NorP):
 		if self.dictRegex[NorP] == []:
 			self.pattern = NorP
-			print('If statement: ' + self.pattern)
 		else:
 			self.pattern = self.dictRegex[NorP]
-			print('Else statement: ' + self.pattern)
 	
 	def employPattern(self,pattern,searchFile):
 		#self.checkInPattern(pick)
 		self.findall = re.findall(pattern,searchFile)
+		self.createResults()
 		
+	def createResults(self):
+		for x in self.findall:
+			if x != '':
+				self.results = self.results + '\n' + x
+	
 	def showResults(self):
-		for line in self.findall:
-			print(line)
+		print(self.results)
+	
 
 
 # Build the built-in regex dictionary
@@ -138,35 +145,36 @@ inFile.openFile(fp,'r')
 print('\n--openedFile contents below--')
 inFile.readFile()
 print(inFile.fileContents)
+inFile.closeFile()
 
 # Create an output file
-#uOutput = input('What would you like to do with the results?\n1) Display on the Screen\n2)Write to file\n3)Both\n>> ')
+#uInOutputFile = input('What would you like to do with the results?\n1) Display on the Screen\n2)Write to file\n3)Both\n>> ')
 print('Creating output file in /tmp/file_test')
-uOutput = '/tmp/file_test'
-"""
+uInOutputFile = '/tmp/file_test'
 print('temporarily defaulting to both')
-outFile = FileHandler(uOutput)
+outFile = FileHandler(uInOutputFile)
 print('path: ' + outFile.pathname)
 print('filename: ' + outFile.filename)
 print('file pre-existing: ' + str(outFile.filePreExists))
 ofp = outFile.pathname + outFile.filename
 outFile.openFile(ofp,'w+')
-"""
 
 # Search the inFile with the regex pattern
-searchFile = regex(uOutput)
+searchFile = regex(uInOutputFile)
 brx.listPatterns()
 regPick = input('Enter the name of a pattern, or enter a regex pattern to search with.\n>> ')
 brxregPick = brx.checkInPattern(regPick)
-print('brxregPick: ' + str(brxregPick))
 searchFile.employPattern(brx.pattern,inFile.fileContents)
-searchFile.showResults()
 
 # Display output file contents
 print('\n--outFile contents below--')
-outFile.seek()
+outFile.writeFile(searchFile.results)
 outFile.readFile()
 print(outFile.fileContents)
+print('\n--searchFile.showResults()--\n')
+searchFile.showResults()
 
-inFile.closeFile()
 searchFile.closeFile()
+outFile.closeFile()
+
+
