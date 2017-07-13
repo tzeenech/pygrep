@@ -131,29 +131,80 @@ class regex:
 	def cleanup(self):
 		self.fhIN.closeFile()
 		self.fhOUT.closeFile()
+
+class CommandLine:
+	'To provide Command-line switch access'
+
+	def __init__(self):
+		self.inf = None
+		self.of = None
+		self.conf = None
+		self.switches()
+				
+	def switches(self):
+		parser = argparse.ArgumentParser()
+		argparse.ArgumentParser(prog='pygrep.py', prefix_chars='-')
+		parser.add_argument('-inf', help='Set the in file',action='store')
+		parser.add_argument('-of', help='Set the out file',action='store')
+		parser.add_argument('-conf', help='Set the pygrep.conf location',action='store')
+		args = parser.parse_args()
+		self.inf = args.inf
+		self.of = args.of
+		self.conf = args.conf
+
+class UserInterface:
+	'For getting any information from the user'
 	
-# Get the file to search through
-uInInputFile = input('What is the path to the file to search through?\n>> ')
+	def __init__(self):
+		self.cmdOpts = CommandLine()
+		self.uInInputFile = None
+		self.uInOutputFile = None
+		self.pygrepCONF = "pygrep.conf"
+		self.setpygrepCONFfile()
+		self.setInputFile()
+		self.setOutputFile()
+		self.run()
+		
+	def setInputFile(self):
+		if self.cmdOpts.inf != None:
+			self.uInInputFile = self.cmdOpts.inf
+		else:
+			self.uInInputFile = input('What is the path to the file to search through?\n>> ')
+		print(self.uInInputFile)
+	
+	def setOutputFile(self):
+		if self.cmdOpts.of != None:
+			self.uInOutputFile = self.cmdOpts.of
+		else:
+			#uInOutputFile = input('What would you like to do with the results?\n1) Display on the Screen\n2)Write to file\n3)Both\n>> ')
+			print('Creating output file in /tmp/file_test')
+			self.uInOutputFile = '/tmp/file_test'
+			print('temporarily defaulting to both')
+		print(self.uInOutputFile)
+		
+	def setpygrepCONFfile(self):
+		if self.cmdOpts.conf != None:
+			self.pygrepCONF = self.cmdOpts.conf
+		print(self.pygrepCONF)
+	
+	def run(self):
+		# Search the inFile with the regex pattern
+		searchFile = regex(self.uInInputFile,self.uInOutputFile,self.pygrepCONF)
+		searchFile.listPatterns()
+		regPick = input('Enter the name of a pattern, or enter a regex pattern to search with.\n>> ')
+		searchFile.checkForPattern(regPick)
+		searchFile.employPattern(searchFile.pattern,searchFile.fhIN.fileContents)
+		# Display output file contents
+		searchFile.fhOUT.writeFile(searchFile.results)
+		print('\n--outFile contents below--')
+		searchFile.fhOUT.readFile()
+		print(searchFile.fhOUT.fileContents)
+		print('\n--searchFile.showResults()--\n')
+		searchFile.showResults()
+		# Cleanup
+		searchFile.cleanup()
 
-# Create an output file
-#uInOutputFile = input('What would you like to do with the results?\n1) Display on the Screen\n2)Write to file\n3)Both\n>> ')
-print('Creating output file in /tmp/file_test')
-uInOutputFile = '/tmp/file_test'
-print('temporarily defaulting to both')
 
-# Search the inFile with the regex pattern
-searchFile = regex(uInInputFile,uInOutputFile,'pygrep.conf')
-searchFile.listPatterns()
-regPick = input('Enter the name of a pattern, or enter a regex pattern to search with.\n>> ')
-searchFile.checkForPattern(regPick)
-searchFile.employPattern(searchFile.pattern,searchFile.fhIN.fileContents)
-
-# Display output file contents
-searchFile.fhOUT.writeFile(searchFile.results)
-print('\n--outFile contents below--')
-searchFile.fhOUT.readFile()
-print(searchFile.fhOUT.fileContents)
-print('\n--searchFile.showResults()--\n')
-searchFile.showResults()
-
-searchFile.cleanup()
+	
+		
+UserInterface()
