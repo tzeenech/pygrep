@@ -4,40 +4,15 @@ import re
 import os
 import argparse
 
-class FileHandler:
-	'For handling all file functions'
-
-	delimiter = self.delimiter
-	pwd = self.pwd
-
+class Environment:
+	'For setting up the defining the environmental details'
+	
 	def __init__(self):
-		#self.pathname = None
-		#self.filename = None
 		self.delimiter = None
-		#self.filePreExists = None
-		#self.openType = None
-		#self.openedFile = None
 		self.pwd = None
-		#self.fileContents = ''
 		self.setPWD()
 		self.OSCheck(self.pwd)
-		#self.separateFilePath(fullpath,self.delimiter)
-		#self.exists(fullpath)
-
-	def __init__(self,fullpath):
-		self.pathname = None
-		self.filename = None
-		#self.delimiter = None
-		self.filePreExists = None
-		self.openType = None
-		self.openedFile = None
-		#self.pwd = None
-		self.fileContents = ''
-		#self.setPWD()
-		#self.OSCheck(self.pwd)
-		self.separateFilePath(fullpath,self.delimiter)
-		self.exists(fullpath)
-
+		
 	def setPWD(self):
 		self.pwd = os.getcwd()
 	
@@ -47,6 +22,20 @@ class FileHandler:
 			self.delimiter = '/'	
 		else:
 			self.delimiter = r'\\'
+
+class FileHandler(Environment):
+	'For handling all file functions'
+
+	def __init__(self,fullpath):
+		super().__init__()
+		self.pathname = None
+		self.filename = None
+		self.filePreExists = None
+		self.openType = None
+		self.openedFile = None
+		self.fileContents = ''
+		self.separateFilePath(fullpath,self.delimiter)
+		self.exists(fullpath)
 
 	def separateFilePath(self,fullpath,slashdir):
 		regexP = '(' + slashdir + ')'
@@ -81,15 +70,36 @@ class FileHandler:
 	def seekFile(self):
 		self.openedFile.seek(0)
 		
+
 class regex:
 	'For dealing with regex patterns: provide a one-time use pattern, add a pattern to pygrep.conf, and apply a pattern to a file'
 	
-	def __init__(self,fullpath):
-		self.pygrepCONF = 'pygrep.conf'
+	def __init__(self,inFile,outFile,configPath):
+		self.fhConfig = FileHandler(configPath)
+		self.fhIN = FileHandler(inFile)
+		self.fhOUT = FileHandler(outFile)
 		self.dictRegex = {}
 		self.pattern = ''
 		self.findall = ''
 		self.results = ''
+		self.builtinPatterns(configPath)
+		self.openInFile(inFile)
+		self.openOutFile(outFile)
+		
+	def builtinPatterns(self,configPath):
+		self.fhConfig.openFile(configPath,self.fhConfig.openType)
+		self.fhConfig.readFile()
+		configList = re.findall('(.+) (.+)',self.fhConfig.fileContents)
+		for x,y in configList:
+			self.createPattern(x,y)
+		self.fhConfig.closeFile()
+	
+	def openInFile(self,inFile):
+		self.fhIN.openFile(inFile,self.fhIN.openType)
+		self.fhIN.readFile()
+		
+	def openOutFile(self,outFile):
+		self.fhOUT.openFile(outFile,self.fhOUT.openType)
 	
 	def createPattern(self,name,pattern):
 		self.dictRegex[name] = pattern
@@ -116,55 +126,32 @@ class regex:
 	
 	def showResults(self):
 		print(self.results)
+		
+	def cleanup(self):
+		self.fhIN.closeFile()
+		self.fhOUT.closeFile()
 	
-
-
-# Build the built-in regex dictionary
-brx = regex('pygrep.conf')
-brx.readFile()
-configList = re.findall('(.+) (.+)',brx.fileContents)
-for x,y in configList:
-	brx.createPattern(x,y)
-
 # Get the file to search through
-uInput = input('What is the path to the file to search through?\n>> ')
-inFile = FileHandler(uInput)
-print('path: ' + inFile.pathname)
-print('filename: ' + inFile.filename)
-print('file pre-existing: ' + str(inFile.filePreExists))
-fp = inFile.pathname + inFile.filename
-inFile.openFile(fp,'r')
-print('\n--openedFile contents below--')
-inFile.readFile()
-print(inFile.fileContents)
-inFile.closeFile()
+uInInputFile = input('What is the path to the file to search through?\n>> ')
 
 # Create an output file
 #uInOutputFile = input('What would you like to do with the results?\n1) Display on the Screen\n2)Write to file\n3)Both\n>> ')
 print('Creating output file in /tmp/file_test')
 uInOutputFile = '/tmp/file_test'
 print('temporarily defaulting to both')
-outFile = FileHandler(uInOutputFile)
-print('path: ' + outFile.pathname)
-print('filename: ' + outFile.filename)
-print('file pre-existing: ' + str(outFile.filePreExists))
-ofp = outFile.pathname + outFile.filename
-outFile.openFile(ofp,'w+')
 
 # Search the inFile with the regex pattern
-searchFile = regex(uInOutputFile)
-brx.listPatterns()
+searchFile = regex(uInInputFile,uInOutputFile,'pygrep.conf')
+searchFile.listPatterns()
 regPick = input('Enter the name of a pattern, or enter a regex pattern to search with.\n>> ')
-brxregPick = brx.checkInPattern(regPick)
-searchFile.employPattern(brx.pattern,inFile.fileContents)
+searchFile.checkForPattern(regPick)
+searchFile.employPattern(searchFile.pattern,searchFile.fhIN.fileContents)
 
 # Display output file contents
+searchFile.fhOUT.writeFile(searchFile.results)
 print('\n--outFile contents below--')
-outFile.writeFile(searchFile.results)
-outFile.readFile()
-print(outFile.fileContents)
+searchFile.fhOUT.readFile()
 print('\n--searchFile.showResults()--\n')
-searchFile.showResults()
+print(searchFile.fhOUT.fileContents)
 
-searchFile.closeFile()
-outFile.closeFile()
+searchFile.cleanup()
