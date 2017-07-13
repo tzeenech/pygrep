@@ -121,8 +121,9 @@ class regex:
 		
 	def createResults(self):
 		for x in self.findall:
-			if x != '':
-				self.results = self.results + '\n' + x
+			#if x != '':
+				#self.results = self.results + '\n' + x
+			self.results = self.results + '\n' + x
 	
 	def showResults(self):
 		print(self.results)
@@ -151,7 +152,8 @@ searchFile.employPattern(searchFile.pattern,searchFile.fhIN.fileContents)
 searchFile.fhOUT.writeFile(searchFile.results)
 print('\n--outFile contents below--')
 searchFile.fhOUT.readFile()
-print('\n--searchFile.showResults()--\n')
 print(searchFile.fhOUT.fileContents)
+print('\n--searchFile.showResults()--\n')
+searchFile.showResults()
 
 searchFile.cleanup()
