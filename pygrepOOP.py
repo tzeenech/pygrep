@@ -6,7 +6,7 @@ import argparse
 
 class Environment:
 	'For setting up the defining the environmental details'
-	
+	tmpFile = ""
 	def __init__(self):
 		self.delimiter = None
 		self.pwd = None
@@ -20,8 +20,10 @@ class Environment:
 		regexdPath = re.findall('^/',pwdPath)
 		if  regexdPath != []:
 			self.delimiter = '/'	
+			self.tmpFile = '/tmp/pygrep.tmp'
 		else:
 			self.delimiter = r'\\'
+			self.tmpFile = r'C:\pygrep.tmp'
 
 class FileHandler(Environment):
 	'For handling all file functions'
